@@ -1,29 +1,74 @@
 #!/usr/bin/python3
-""" """
+""" ALL THE TESTS"""
 from tests.test_models.test_base_model import test_basemodel
 from models.review import Review
+from models.base_model import BaseModel
+import unittest
+from os import getenv
+import pep8
+import models
+from models.engine.db_storage import DBStorage
 
 
-class test_review(test_basemodel):
-    """ """
+class test_Review_(unittest.TestCase):
+    """ UNITTEST REVIEW"""
+    @classmethod
+    def setUp(self):
+        """SetUp method"""
 
-    def __init__(self, *args, **kwargs):
-        """ """
-        super().__init__(*args, **kwargs)
-        self.name = "Review"
-        self.value = Review
+        self.review = Review()
+        self.review.user_id = "E4ZA"
+        self.review.place_id = "R1475"
+        self.review.text = "The consulktation was very helpful."
 
-    def test_place_id(self):
-        """ """
-        new = self.value()
-        self.assertEqual(type(new.place_id), str)
+    @classmethod
+    def TearDown(self):
+        """TearDown method."""
 
-    def test_user_id(self):
-        """ """
-        new = self.value()
-        self.assertEqual(type(new.user_id), str)
+        del self.review
 
-    def test_text(self):
-        """ """
-        new = self.value()
-        self.assertEqual(type(new.text), str)
+    def test_docstring(self):
+        """Test docstring for the module and the class"""
+
+        self.assertIsNotNone(
+            models.review.__doc__,
+            "No docstring in the module"
+        )
+        self.assertIsNotNone(Review.__doc__, "No docstring in the class")
+
+    def test_pep8_style_check(self):
+        """Test pep8"""
+
+        style = pep8.StyleGuide(quiet=True)
+        s = style.check_files(['models/review.py'])
+        self.assertEqual(s.total_errors, 0, "pep8 error needs fixing")
+
+    def test_type_object(self):
+        """Test type object of Review"""
+
+        self.assertEqual(
+            str(type(self.review)),
+            "<class 'models.review.Review'>")
+        self.assertIsInstance(self.review, Review)
+
+    def test_Review_inheritence(self):
+        """checks if inherits"""
+
+        self.assertIsInstance(self.review, BaseModel)
+
+    def test_db_tbname(self):
+        """checks the tablename"""
+
+        self.assertEqual(self.review.__tablename__, "reviews")
+
+    @unittest.skipIf(
+        type(models.storage) == DBStorage,
+        "Testing database storage only")
+    def test_Review_attributes(self):
+        """ check attr"""
+        place_id = getattr(self.review, "place_id")
+        self.assertIsInstance(place_id, str)
+        user_id = getattr(self.review, "user_id")
+        self.assertIsInstance(user_id, str)
+        text = getattr(self.review, "text")
+        self.assertIsInstance(text, str)
